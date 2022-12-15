@@ -5,6 +5,10 @@
 // import transactions from './inputs/transactions';
 
 const express = require('express');
+const cors = require('cors');
+
+const app = express();
+//call dummy data
 const nasabah = require('./inputs/nasabah.js');
 const print_report = require('./inputs/print_report.js');
 const check_points = require('./inputs/check_points.js');
@@ -13,9 +17,36 @@ const transactions = require('./inputs/transactions.js');
 const pool = require('./db.js');
 
 
+//middleware
+app.use(cors());
+app.use(express.json());
 
-const app = express()
-//define routes
+//define routes post
+app.post("/nasabah", async (req, res)=>{
+    try {
+        console.log(req.body);
+        const {account_id, nasabah_name} = req.body;
+        const new_nasabah = await pool.query("INSERT INTO nasabah (account_id, nasabah_name) VALUES ($1, $2)", [
+        account_id, nasabah_name
+    ]);
+    } catch (err){
+        console.log(err.message);
+    }
+});
+app.post("/transactions", async (req, res)=>{
+    try {
+        console.log(req.body);
+        const {account_id, transaction_date, description, debit_credit_status, amount} = req.body;
+        const new_nasabah = await pool.query("INSERT INTO transactions (account_id, account_transaction, descriptions, debit_credit, amount) VALUES ($1, $2, $3, $4, $5)", [
+        account_id, transaction_date, description, debit_credit_status, amount
+    ]);
+    } catch (err){
+        console.log(err.message);
+    }
+});
+
+
+//define routes get
 app.get('/api/psql-nasabah', async (req, res)=>{
     try {
         const {rows} = await pool.query('SELECT * FROM nasabah');
@@ -50,7 +81,7 @@ app.get('/api/psql-print_report', async (req, res)=>{
 });
 
 app.get('/', (req, res)=>{
-    res.send('API is running...')
+    res.send('API is running....')
 });
 
 // app.get('/api/nasabah', (req, res)=>{
