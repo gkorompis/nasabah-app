@@ -44,6 +44,17 @@ app.post("/transactions", async (req, res)=>{
         console.log(err.message);
     }
 });
+app.post("/print-report", async (req, res)=>{
+    try {
+        console.log(req.body);
+        const {account_id} = req.body;
+        const new_nasabah = await pool.query("INSERT INTO transactions (account_id, account_transaction, descriptions, debit_credit, amount) VALUES ($1, $2, $3, $4, $5)", [
+        account_id, transaction_date, description, debit_credit_status, amount
+    ]);
+    } catch (err){
+        console.log(err.message);
+    }
+});
 
 
 //define routes get
